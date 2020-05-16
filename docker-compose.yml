@@ -1,0 +1,84 @@
+---
+version: '3'
+services:
+
+  #PHP Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: otezvikentiy/php7.2-fpm:0.0.13
+    container_name: app
+    restart: unless-stopped
+    tty: true
+    env_file:
+      - ./.env/php.env
+    working_dir: /var/www
+    networks: 
+      - app-network
+    volumes:
+      - ./lumen-app/yourprojectname:/var/www
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+  
+  #Nginx Service
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - app-network
+    volumes:
+      - ./lumen-app/yourprojectname:/var/www
+      - ./nginx/conf.d:/etc/nginx/conf.d/
+      - ./nginx/log:/var/log/nginx
+      
+    
+  #MySQL Service
+  db:
+    image: mysql:5.7.22
+    container_name: db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./.env/db.env
+    networks:
+      - app-network
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+
+  dblogging:
+    image: mysql:5.7.22
+    container_name: dblogging
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3307:3306"
+    env_file:
+      - ./.env/dblogging.env
+    networks:
+      - app-network
+    volumes:
+      - dbloggingdata:/var/lib/mysql
+      - ./mysql/mydblogging.cnf:/etc/mysql/my.cnf
+      
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.17.0/24
+
+volumes:
+  dbdata:
+    driver: local
+  dbloggingdata:
+    driver: local
+
+
