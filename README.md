@@ -8,7 +8,7 @@ cd /opt;git clone http://git.mobtaker.local/mobtaker-team/docker-compose-lumen.g
 ```
 
 ### Step2
-change your directory to cloned directory and cp your env files for php and db and phpmyadmin images and change it to your own information.
+change your directory to cloned directory and cp your env files for php and db and dblogging images and change it to your own information.
 ```
 cp .env/.db.env.example .env/db.env
 cp .env/.dblogging.env.example .env/dblogging.env
